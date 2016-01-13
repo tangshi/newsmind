@@ -1,0 +1,3 @@
+# newsmind
+
+a simple demo
