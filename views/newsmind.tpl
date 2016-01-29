@@ -32,15 +32,9 @@
         </div>
 
         <div>
-            <div class="input-group">
-                <span class="input-group-btn">
-                <button class="btn btn-success" type="button">新建任务</button>
-              </span>
-                <input type="text" class="form-control" placeholder="输入任务名新建任务...">
-            </div>
-            <!-- /input-group -->
-
-            <h3></h3>
+            <p>
+                <button type="button" class="btn btn-success">新建任务</button>
+            </p>
 
             <div class="panel panel-success">
                 <!-- panel contents -->
@@ -48,12 +42,12 @@
                 <div class="panel-body">
                     <p><i>任务列表按照创建时间的先后逆序排列，最新创建的任务排在第一位，点击任务条目可查看任务详情。</i></p>
                 </div>
+
                 <!-- List group -->
                 <ul class="list-group">
-                    <a href="#" class="list-group-item">任务1</a>
-                    <a href="#" class="list-group-item">任务2</a>
-                    <a href="#" class="list-group-item">任务3</a>
-                    <a href="#" class="list-group-item">任务4</a>
+                    % for name in tasknames:
+                    <a href="tasks/{{name}}" class="list-group-item">{{name}}</a>
+                    % end
                 </ul>
             </div>
         </div>
