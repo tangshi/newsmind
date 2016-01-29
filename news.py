@@ -28,7 +28,7 @@ class NewsAPI(object):
         self.appid = str(appid)
         self.appsign = appsign
         self.apihead = "http://route.showapi.com/109-35?showapi_appid=" + self.appid + "&showapi_sign=" + self.appsign
-        self.channels = self.__getChannels()
+        self.channels = self.__getChannelList()
         if self.channels is None:
             raise NewsError('Can not fetch news channels')
 
@@ -67,7 +67,7 @@ class NewsAPI(object):
         url = "http://route.showapi.com/109-34?showapi_appid=" + self.appid + "&showapi_sign=" + self.appsign
         url = url + "&showapi_timestamp=" + datetime.now().strftime('%Y%m%d%H%M%S')
         channelList = []
-        resp = self.getApiRespondData(url)
+        resp = self.requestAPI(url)
         if resp is None:
             return None
         for channelDict in resp['showapi_res_body']['channelList']:
@@ -175,12 +175,15 @@ class NewsData(object):
         news_str_list = map(lambda item: item.title + '\n' + item.desc, orderedItems)
         return reduce(lambda ns1, ns2: ns1 + '\n\n' + ns2, news_str_list)
 
-    def save(self):
+    def save(self, name=None):
         dataDir = os.getcwd() + os.sep + "data" + os.sep
         if os.path.exists(dataDir) is False:
             os.mkdir(dataDir)
-        filepath = dataDir + self.channelName + ' ' + self.startDate.strftime("%Y-%m-%d" + '.txt')
+        if name is None:
+            name = self.channelName
+        filepath = dataDir + name + ' ' + self.startDate.strftime("%Y-%m-%d" + '.txt')
         with open(filepath, 'w') as f:
+            self.name = name
             try:
                 data = json.dumps(self, default=self.__toDict)
                 f.write(data)
@@ -197,6 +200,7 @@ class NewsData(object):
                 raise NewsError("Error: can not load news data from " + filepath)
 
     def __fromDict(self, jsondict):
+        self.name = jsondict['name']
         self.channelId, self.channelName = self.newsapi.findChannel(jsondict['channelName'])
         self.startDate = jsondict['startDate']
         self.lastMarkTime = jsondict['lastMarkTime']
@@ -204,6 +208,7 @@ class NewsData(object):
 
     def __toDict(self):
         d = {}
+        d['name'] = self.name
         d['channelName'] = self.channelName
         d['startDate'] = self.startDate.strftime("%Y-%m-%d")
         d['lastMarkTime'] = self.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")
