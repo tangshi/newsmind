@@ -33,7 +33,7 @@
 
         <div>
             <p>
-                <button type="button" class="btn btn-success">新建任务</button>
+                <a href="newtask" class="btn btn-success active" role="button">新建任务</a>
             </p>
 
             <div class="panel panel-success">
