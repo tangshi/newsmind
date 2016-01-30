@@ -74,10 +74,6 @@ class NewsAPI(object):
             name = channelDict['name']
             if u'焦点' in name:
                 continue
-            if len(name) > 4:
-                name = name[:-2]
-            else:
-                name = name.replace('最新', '新闻')
             channelId = channelDict['channelId']
             channelList.append(NewsChannel(channelId, name))
         return tuple(channelList)

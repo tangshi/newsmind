@@ -24,13 +24,13 @@
     <div class="container " role="main">
         <form class="form-horizontal" action="/newtask" method="post">
             <div class="form-group">
-                <label for="taskname" class="col-sm-2 control-label">输入任务名称</label>
+                <label for="taskname" class="col-sm-2 control-label">任务名称</label>
                 <div class="col-sm-10">
                     <input type="email" class="form-control" id="taskname" placeholder="请为新任务命名">
                 </div>
             </div>
             <div class="form-group">
-                <label for="channelname" class="col-sm-2 control-label">选择新闻频道</label>
+                <label for="channelname" class="col-sm-2 control-label">新闻频道</label>
                 <div class="col-sm-10">
                     <select class="form-control" id="channelname">
                         % for channel in channels:
