@@ -40,6 +40,7 @@ def showTask(taskname):
     for t in tasks:
         if t.name == taskname:
             task = t
+            break
     if task is None:
         abort(code=404, text="Task dose NOT exist!")
     # TODO return task detail page
@@ -52,7 +53,7 @@ def newTask():
 
 
 def checkNewTask(taskname, channelname):
-    if taskname is None or channelname is None:
+    if taskname == "" or channelname == "":
         return False
     else:
         return True
@@ -62,6 +63,7 @@ def checkNewTask(taskname, channelname):
 def createNewTask():
     taskname = request.forms.get('taskname')
     channelname = request.forms.get('channelname')
+    print(taskname, channelname)
     # TODO create a new task
     if checkNewTask(taskname, channelname):
         redirect('/tasks/' + taskname)

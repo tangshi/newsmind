@@ -22,17 +22,17 @@
 <body role="document">
 
     <div class="container " role="main">
-        <form class="form-horizontal" action="/newtask" method="post">
-            <div class="form-group">
-                <label for="taskname" class="col-sm-2 control-label">任务名称</label>
+        <form class="form-horizontal" onsubmit="return checkTaskname()" action="/newtask" method="post">
+            <div class="form-group" id="tasknameinputdiv" >
+                <label class="col-sm-2 control-label">任务名称</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" id="taskname" placeholder="请为新任务命名">
+                    <input type="text" class="form-control" id="tasknameinput" name="taskname" placeholder="请为新任务命名">
                 </div>
             </div>
             <div class="form-group">
-                <label for="channelname" class="col-sm-2 control-label">新闻频道</label>
+                <label class="col-sm-2 control-label">新闻频道</label>
                 <div class="col-sm-10">
-                    <select class="form-control" id="channelname">
+                    <select class="form-control" id="channelnameselect" name="channelname">
                         % for channel in channels:
                         <option>{{channel.name}}</option>
                         % end
@@ -49,6 +49,19 @@
     </div>
     <!-- /container -->
 
+    <script>
+        function checkTaskname() {
+            var taskname = document.getElementById('tasknameinput').value;
+            if (taskname == "" || taskname == null) {
+                var inputdiv = document.getElementById('tasknameinputdiv');
+                inputdiv.className = inputdiv.className + ' has-error';
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
     <!-- Bootstrap core JavaScript -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
