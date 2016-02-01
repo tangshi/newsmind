@@ -1,3 +1,5 @@
+# coding=utf-8
+
 '''
 A simple web app based on [Bottle](http://bottlepy.org/)
 '''
@@ -12,6 +14,8 @@ init global variables
 load all exists tasks
 '''
 newsapi = NewsAPI('15505', '80af212f997b4382ba62ca7d2c79f4f7')
+if os.path.exists('data') is False:
+    os.mkdir('data')
 files = list(filter(lambda name: name.endswith(".txt"), os.listdir('data')))
 tasks = []
 dataDir = os.getcwd() + os.sep + "data" + os.sep
@@ -63,9 +67,13 @@ def checkNewTask(taskname, channelname):
 def createNewTask():
     taskname = request.forms.get('taskname')
     channelname = request.forms.get('channelname')
-    print(taskname, channelname)
+    for ch in newsapi.channels:
+        if channelname == ch.name:
+            print("Bingo: ", ch.Id)
+        else:
+            print(ch.name)
     # TODO create a new task
-    if checkNewTask(taskname, channelname):
+    if checkNewTask(taskname.encode('utf-8'), channelname.encode('utf-8')):
         redirect('/tasks/' + taskname)
     else:
         return "<p>Failed.</p>"
