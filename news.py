@@ -2,6 +2,7 @@
 
 import os
 import json
+import time
 from functools import reduce
 import urllib.request
 import urllib.error
@@ -36,7 +37,7 @@ class NewsAPI(object):
         url = self.getAPIUrl(channelId, page)
         try:
             return self.requestAPI(url)
-        except Exception:
+        except urllib.error.URLError:
             raise NewsError("Can not fetch news data")
 
     def getAPIUrl(self, channelId, page=1):
@@ -90,7 +91,12 @@ class NewsItem(object):
         return self.hash
 
     def toDict(self):
-        return selt.__dict__
+        d = {}
+        d['title'] = self.title
+        d['pubDate'] = self.pubDate.strftime("%Y-%m-%d %H:%M:%S")
+        d['desc'] = self.desc
+        d['hash'] = self.hash
+        return d
 
 
 class NewsData(object):
@@ -161,6 +167,7 @@ class NewsData(object):
 
             process_news_data()
             for p in range(2, self.allPages + 1):
+                time.sleep(1)
                 self.currentPage = self.currentPage + 1
                 newsdata = self.newsapi.fetchNewsData(self.channelId, self.currentPage)
                 res_code = process_news_data()
@@ -185,7 +192,8 @@ class NewsData(object):
         with open(filepath, 'w') as f:
             self.name = name
             try:
-                data = json.dumps(self, default=self.__toDict)
+                toDict = self.__toDict()
+                data = json.dumps(toDict)
                 f.write(data)
             except Exception as e:
                 print(e)
