@@ -22,7 +22,7 @@
 <body role="document">
 
     <div class="container " role="main">
-        <form class="form-horizontal" onsubmit="return checkTaskname()" action="/newtask" method="post">
+        <form class="form-horizontal" onsubmit="return checkTaskname()" action="/newtask" method="post" accept-charset="utf-8" >
             <div class="form-group" id="tasknameinputdiv" >
                 <label class="col-sm-2 control-label">任务名称</label>
                 <div class="col-sm-10">
@@ -32,9 +32,9 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">新闻频道</label>
                 <div class="col-sm-10">
-                    <select class="form-control" id="channelnameselect" name="channelname">
+                    <select class="form-control" id="channelselect" name="channelid">
                         % for channel in channels:
-                        <option>{{channel.name}}</option>
+                        <option value="{{channel.Id}}">{{channel.name}}</option>
                         % end
                     </select>
                 </div>
@@ -52,6 +52,7 @@
     <script>
         function checkTaskname() {
             var taskname = document.getElementById('tasknameinput').value;
+            document.getElementById('tasknameinput').value = encodeURI(taskname);
             if (taskname == "" || taskname == null) {
                 var inputdiv = document.getElementById('tasknameinputdiv');
                 inputdiv.className = inputdiv.className + ' has-error';

@@ -189,11 +189,11 @@ class NewsData(object):
         if name is None:
             name = self.channelName
         filepath = dataDir + name + ' ' + self.startDate.strftime("%Y-%m-%d" + '.txt')
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             self.name = name
             try:
                 toDict = self.__toDict()
-                data = json.dumps(toDict)
+                data = json.dumps(toDict, ensure_ascii=False)
                 f.write(data)
             except Exception as e:
                 print(e)

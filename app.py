@@ -5,6 +5,7 @@ A simple web app based on [Bottle](http://bottlepy.org/)
 '''
 
 import os
+from urllib import parse
 from news import NewsAPI, NewsData
 from bottle import route, run, template, error, static_file, abort, request, redirect
 
@@ -66,14 +67,20 @@ def checkNewTask(taskname, channelname):
 @route('/newtask', method='POST')
 def createNewTask():
     taskname = request.forms.get('taskname')
-    channelname = request.forms.get('channelname')
-    for ch in newsapi.channels:
-        if channelname == ch.name:
-            print("Bingo: ", ch.Id)
-        else:
-            print(ch.name)
+    unquotedtaskname = parse.unquote(taskname)
+    print("taskname: ", unquotedtaskname)
+    channelid = request.forms.get('channelid')
+    print("cannelid: ", channelid)
+    channelname = None
+    for channel in newsapi.channels:
+        if channel.Id == channelid:
+            channelname = channel.name
+            break
+    if channelname is None:
+        return "<p>Unknown channel.</p>"
+    print(unquotedtaskname, channelname)
     # TODO create a new task
-    if checkNewTask(taskname.encode('utf-8'), channelname.encode('utf-8')):
+    if checkNewTask(taskname, channelname):
         redirect('/tasks/' + taskname)
     else:
         return "<p>Failed.</p>"
