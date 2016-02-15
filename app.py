@@ -6,27 +6,42 @@ A simple web app based on [Bottle](http://bottlepy.org/)
 
 import os
 from urllib import parse
+from datetime import date
+from bottle import Bottle, abort, error, redirect, request, run, static_file, template
 from news import NewsAPI, NewsData
-from bottle import route, run, template, error, static_file, abort, request, redirect
 
 
-'''
-init global variables
-load all exists tasks
-'''
+class Task:
+    def __init__(self, name=None, filepath=None):
+        if filepath is not None:
+            beg = filepath.rfind('/') + 1
+            end = filepath.rfind(".")
+            if end == -1:
+                end = len(filepath)
+            filename = filepath[beg:end]
+            space = filename.rfind(' ')
+            self.name = filename[:space]
+            self.datestr = filename[space+1:]
+        else:
+            self.name = name
+            self.datestr = date.today().strftime("%Y-%m-%d")
+        self.filepath = filepath
+        self.newsdata = None
+
+
+bottle = Bottle()
 newsapi = NewsAPI('15505', '80af212f997b4382ba62ca7d2c79f4f7')
+
+workdir = os.getcwd()
 if os.path.exists('data') is False:
     os.mkdir('data')
 files = list(filter(lambda name: name.endswith(".txt"), os.listdir('data')))
 tasks = []
-dataDir = os.getcwd() + os.sep + "data" + os.sep
+datadir = workdir + os.sep + "data" + os.sep
 for f in files:
-    try:
-        t = NewsData(newsapi, filepath=(dataDir + f))
-        tasks.append(t)
-    except:
-        pass
-tasks.sort(key=lambda nd: nd.startDate, reverse=True)
+    t = Task(filepath=(datadir + f))
+    tasks.append(t)
+tasks.sort(key=lambda t: t.datestr, reverse=True)
 
 
 @error(404)
@@ -34,12 +49,12 @@ def error404(error):
     return 'PAGE NOT FOUND !'
 
 
-@route('/static/<filename:path>')
+@bottle.route('/static/<filename:path>')
 def sendStatic(filename):
     return static_file(filename, root='./static/')
 
 
-@route('/tasks/<taskname>')
+@bottle.route('/tasks/<taskname>')
 def showTask(taskname):
     task = None
     for t in tasks:
@@ -48,11 +63,13 @@ def showTask(taskname):
             break
     if task is None:
         abort(code=404, text="Task dose NOT exist!")
+    if task.newsdata is None:
+        task.newsdata = NewsData(newsapi, filepath=task.filepath)
     # TODO return task detail page
     return taskname
 
 
-@route('/newtask')
+@bottle.route('/newtask')
 def newTask():
     return template('newtask', channels=newsapi.channels)
 
@@ -64,31 +81,39 @@ def checkNewTask(taskname, channelname):
         return True
 
 
-@route('/newtask', method='POST')
+@bottle.route('/newtask', method='POST')
 def createNewTask():
     taskname = request.forms.get('taskname')
     unquotedtaskname = parse.unquote(taskname)
-    print("taskname: ", unquotedtaskname)
+    print("taskname:", unquotedtaskname)
     channelid = request.forms.get('channelid')
-    print("cannelid: ", channelid)
     channelname = None
     for channel in newsapi.channels:
         if channel.Id == channelid:
             channelname = channel.name
             break
     if channelname is None:
-        return "<p>Unknown channel.</p>"
-    print(unquotedtaskname, channelname)
-    # TODO create a new task
-    if checkNewTask(taskname, channelname):
-        redirect('/tasks/' + taskname)
+        return "Unknown channel."
+    print("cannelid:", channelid, "channelname:", channelname)
+    if checkNewTask(taskname, channelname) is False:
+        return "Failed to create task."
     else:
-        return "<p>Failed.</p>"
+        task = None
+        global tasks
+        for t in tasks:
+            if t.name == unquotedtaskname:
+                task = t
+                break
+        if task is None:
+            task = Task(name=unquotedtaskname)
+            task.newsdata = NewsData(newsapi, channelName=channelname)
+            tasks.append(task)
+        redirect('/tasks/' + taskname)
 
-
-@route('/')
+@bottle.route('/')
 def root():
-    # tasknames = list(map(lambda t: t.name, tasks))
-    return template('newsmind', tasknames=files)
+    tasknames = list(map(lambda task: task.name, tasks))
+    return template('newsmind', tasknames=tasknames)
 
-run(host='localhost', port=8080, debug=True)
+
+run(bottle, host='localhost', port=8000, debug=True, reloader=True)

@@ -85,7 +85,11 @@ class NewsItem(object):
         self.title = dataDict['title']
         self.pubDate = datetime.strptime(dataDict['pubDate'], "%Y-%m-%d %H:%M:%S")
         self.desc = dataDict['desc']
-        self.hash = hash(dataDict['link'])
+        if dataDict.get('hash') is not None:
+            self.hash = dataDict['hash']
+        else:
+            link = dataDict.get('link')
+            self.hash = hash(link)
 
     def __hash__(self):
         return self.hash
@@ -182,13 +186,11 @@ class NewsData(object):
         news_str_list = map(lambda item: item.title + '\n' + item.desc, orderedItems)
         return reduce(lambda ns1, ns2: ns1 + '\n\n' + ns2, news_str_list)
 
-    def save(self, name=None):
+    def save(self, name):
         dataDir = os.getcwd() + os.sep + "data" + os.sep
         if os.path.exists(dataDir) is False:
             os.mkdir(dataDir)
-        if name is None:
-            name = self.channelName
-        filepath = dataDir + name + ' ' + self.startDate.strftime("%Y-%m-%d" + '.txt')
+        filepath = dataDir + name + ' ' + self.startDate.strftime("%Y-%m-%d") + '.txt'
         with open(filepath, 'w', encoding='utf-8') as f:
             self.name = name
             try:
@@ -199,7 +201,7 @@ class NewsData(object):
                 print(e)
                 raise NewsError("Error: can not save news data")
 
-    def load(self, filepath, newsapi):
+    def load(self, filepath):
         with open(filepath, 'r') as f:
             try:
                 self.__fromDict(json.loads(f.read()))

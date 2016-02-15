@@ -1,6 +1,9 @@
 # virtualenv directory
 venv/
 
+# vscode setting
+.vscode/
+
 # data directory
 data/
 
