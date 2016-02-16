@@ -46,7 +46,7 @@ tasks.sort(key=lambda t: t.datestr, reverse=True)
 
 @error(404)
 def error404(error):
-    return 'PAGE NOT FOUND !'
+    return template('error')
 
 
 @bottle.route('/static/<filename:path>')
@@ -109,6 +109,7 @@ def createNewTask():
             task.newsdata = NewsData(newsapi, channelName=channelname)
             tasks.append(task)
         redirect('/tasks/' + taskname)
+
 
 @bottle.route('/')
 def root():
