@@ -107,7 +107,7 @@ def createNewTask():
         if task is None:
             task = Task(name=unquotedtaskname)
             task.newsdata = NewsData(newsapi, channelName=channelname)
-            tasks.append(task)
+            tasks.insert(0, task)
         redirect('/tasks/' + taskname)
 
 

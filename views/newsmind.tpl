@@ -28,7 +28,7 @@
         </nav>
 
         <div class="jumbotron">
-            <p>这是《网络数据挖掘与分析》课程的一个小样，用于收集网络新闻数据，并通过重要度分析提取新闻中的关键词，挖掘一段时间内的新闻热点和趋势。</p>
+            <p>这是《网络数据挖掘与分析》课程的一个小样，它会收集最近一段时间内的网络新闻数据，并通过重要度分析提取新闻中的关键词，以便学生进一步挖掘最近的新闻热点。</p>
         </div>
 
         <div>
@@ -40,13 +40,17 @@
                 <!-- panel contents -->
                 <div class="panel-heading">任务列表</div>
                 <div class="panel-body">
-                    <p><i>任务列表按照创建时间的先后逆序排列，最新创建的任务排在第一位，点击任务条目可查看任务详情。</i></p>
+                    <p>
+                        <i>任务列表按照创建时间的先后逆序排列，最新创建的任务排在第一位，点击任务条目可查看任务详情。</i>
+                    </p>
                 </div>
 
                 <!-- List group -->
                 <ul class="list-group">
                     % for name in tasknames:
-                    <a href="tasks/{{name}}" class="list-group-item">{{name}}</a>
+                    <a href="tasks/{{name}}" class="list-group-item">
+                        <h4>{{name}}</h4>
+                    </a>
                     % end
                 </ul>
             </div>

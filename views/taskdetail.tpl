@@ -8,7 +8,7 @@
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
     <link rel="icon" href="/static/icon.ico">
-    <title>新建任务</title>
+    <title>{{task.name}}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -22,23 +22,43 @@
 <body role="document">
 
     <div class="container " role="main">
+        <div class="page-header">
+            <h1>{{task.name}}</h1>
+        </div>
 
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">任务详情</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p><b>创建时间：</b>{{task.datestr}}</p>
+                        <p><b>新闻条目：</b>{{len(task.newsdata.newsItems)}}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-sm-5 -->
+
+            <div class="col-sm-7">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">关键词排行榜</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ol>
+                            % for word, weight in task.newsdata.getKeyWords(10):
+                            <li>{{word}} : {{weight}}</li>
+                            % end
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-sm-7 -->
+        </div>
     </div>
     <!-- /container -->
 
-    <script>
-        function checkTaskname() {
-            var taskname = document.getElementById('tasknameinput').value;
-            if (taskname == "" || taskname == null) {
-                var inputdiv = document.getElementById('tasknameinputdiv');
-                inputdiv.className = inputdiv.className + ' has-error';
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-    </script>
     <!-- Bootstrap core JavaScript -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
