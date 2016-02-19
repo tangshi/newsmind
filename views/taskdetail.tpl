@@ -48,7 +48,7 @@
                     <div class="panel-body">
                         <ol>
                             % for word, weight in task.newsdata.getKeyWords(10):
-                            <li>{{word}} : {{weight}}</li>
+                            <li>{{word}} : {{str("%.3f"%weight)}}</li>
                             % end
                         </ol>
                     </div>

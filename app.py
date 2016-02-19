@@ -65,13 +65,7 @@ def showTask(taskname):
         abort(code=404, text="Task dose NOT exist!")
     if task.newsdata is None:
         task.newsdata = NewsData(newsapi, filepath=task.filepath)
-    # TODO return task detail page
-    return taskname
-
-
-@bottle.route('/newtask')
-def newTask():
-    return template('newtask', channels=newsapi.channels)
+    return template('taskdetail', task=task)
 
 
 def checkNewTask(taskname, channelname):
@@ -113,8 +107,7 @@ def createNewTask():
 
 @bottle.route('/')
 def root():
-    tasknames = list(map(lambda task: task.name, tasks))
-    return template('newsmind', tasknames=tasknames)
+    return template('newsmind', tasks=tasks, channels=newsapi.channels)
 
 
 run(bottle, host='localhost', port=8000, debug=True, reloader=True)
