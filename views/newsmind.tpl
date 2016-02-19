@@ -35,7 +35,7 @@
       <!-- <p><a href="newtask" class="btn btn-success active" role="button">新建任务</a></p> -->
 
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newTaskModal">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newTaskModal" onclick="initModal()">
         新建任务
       </button>
       <p></p>
@@ -93,7 +93,7 @@
           % for task in tasks:
           <a href="tasks/{{task.name}}" class="list-group-item">
             <h4 class="list-group-item-heading">{{task.name}}</h4>
-            <p class="list-group-item-text">{{task.datestr}}</p>
+            <p class="list-group-item-text">创建于: {{task.datestr}}</p>
           </a>
           % end
         </ul>
@@ -117,10 +117,15 @@
         return true;
       }
     }
+
+    function initModal() {
+      document.getElementById('tasknameinput').value = "";
+      document.getElementById('tasknameinputdiv').className = "form-group";
+    }
   </script>
   <!-- Bootstrap core JavaScript -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+  <script src="static/js/jquery.min.js"></script>
   <script src="static/js/bootstrap.min.js"></script>
 </body>
 

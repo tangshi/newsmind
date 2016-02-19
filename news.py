@@ -183,8 +183,12 @@ class NewsData(object):
 
     def combineAllNewsItems(self):
         orderedItems = sorted(self.newsItems, key=lambda item: item.pubDate.year*10000+item.pubDate.month*100+item.pubDate.day, reverse=True)
-        news_str_list = map(lambda item: item.title + '\n' + item.desc, orderedItems)
-        return reduce(lambda ns1, ns2: ns1 + '\n\n' + ns2, news_str_list)
+        news_str_list = list(map(lambda item: item.title + '\n' + item.desc, orderedItems))
+        if len(news_str_list) == 0:
+            result = ""
+        else:
+            result = reduce(lambda ns1, ns2: ns1 + '\n\n' + ns2, news_str_list)
+        return result
 
     def save(self, name):
         dataDir = os.getcwd() + os.sep + "data" + os.sep
