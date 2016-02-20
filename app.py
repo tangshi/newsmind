@@ -54,8 +54,7 @@ def sendStatic(filename):
     return static_file(filename, root='./static/')
 
 
-@bottle.route('/tasks/<taskname>')
-def showTask(taskname):
+def findTask(taskname):
     task = None
     for t in tasks:
         if t.name == taskname:
@@ -63,9 +62,30 @@ def showTask(taskname):
             break
     if task is None:
         abort(code=404, text="Task dose NOT exist!")
+    return task
+
+
+@bottle.route('/tasks/<taskname>')
+def showTask(taskname):
+    task = findTask(taskname)
     if task.newsdata is None:
         task.newsdata = NewsData(newsapi, filepath=task.filepath)
     return template('taskdetail', task=task)
+
+
+@bottle.route('/tasks/<taskname>', method='POST')
+def refreshTask(taskname):
+    task = findTask(taskname)
+    task.newsdata.fetch()
+
+
+@bottle.route('/deltask/<taskname>')
+def deleteTask(taskname):
+    global tasks
+    task = findTask(taskname)
+    os.remove(task.newsdata.getFilePath())
+    tasks.remove(task)
+    redirect('/')
 
 
 def checkNewTask(taskname, channelname):
@@ -75,7 +95,7 @@ def checkNewTask(taskname, channelname):
         return True
 
 
-@bottle.route('/newtask', method='POST')
+@bottle.route('/tasks', method='POST')
 def createNewTask():
     taskname = request.forms.get('taskname')
     unquotedtaskname = parse.unquote(taskname)
@@ -100,7 +120,8 @@ def createNewTask():
                 break
         if task is None:
             task = Task(name=unquotedtaskname)
-            task.newsdata = NewsData(newsapi, channelName=channelname)
+            task.newsdata = NewsData(newsapi, name=task.name, channelName=channelname)
+            task.newsdata.save()
             tasks.insert(0, task)
         redirect('/tasks/' + taskname)
 

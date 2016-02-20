@@ -104,7 +104,7 @@ class NewsItem(object):
 
 
 class NewsData(object):
-    def __init__(self, newsapi, channelName=None, filepath=None):
+    def __init__(self, newsapi, filepath=None, name=None, channelName=None):
         self.allPages = 0
         self.currentPage = 1
         self.maxResult = 20
@@ -117,6 +117,8 @@ class NewsData(object):
             today = date.today()
             self.startDate = today
             self.lastMarkTime = datetime(today.year, today.month, today.day)
+            self.name = name
+            self.keywords = []
 
     def __iter__(self):
         self.__index = 0
@@ -134,7 +136,7 @@ class NewsData(object):
                 return True
         return False
 
-    def getKeyWords(self, topN=10, withWeight=True, exclude=None):
+    def getKeyWords(self, topN=20, withWeight=True, exclude=None):
         exclude_default = set([u'记者', u'新闻', u'报', u'本报', u'月', u'日'])
         if exclude is not None:
             exclude_input = set(exclude)
@@ -143,11 +145,14 @@ class NewsData(object):
             exclude = exclude_default
         total = self.combineAllNewsItems()
         res = []
-        for key, weight in jieba.analyse.textrank(total, topN+len(exclude), withWeight):
+        for key, weight in jieba.analyse.textrank(total, topK=None, withWeight=withWeight):
             if key in exclude:
                 continue
             res.append((key, weight))
-        return res[:topN]
+        if topN:
+            return res[:topN]
+        else:
+            return res
 
     def fetch(self):
         try:
@@ -178,11 +183,16 @@ class NewsData(object):
                 if res_code != 0:
                     break
             self.lastMarkTime = newMarkTime
+            self.keywords = self.getKeyWords()
+            self.save()
         except Exception as err:
             print(err)
 
     def combineAllNewsItems(self):
-        orderedItems = sorted(self.newsItems, key=lambda item: item.pubDate.year*10000+item.pubDate.month*100+item.pubDate.day, reverse=True)
+        def sortedkey(newsitem):
+            pubDate = newsitem.pubDate
+            return pubDate.year*10000 + pubDate.month*100 + pubDate.day
+        orderedItems = sorted(self.newsItems, key=sortedkey, reverse=True)
         news_str_list = list(map(lambda item: item.title + '\n' + item.desc, orderedItems))
         if len(news_str_list) == 0:
             result = ""
@@ -190,13 +200,24 @@ class NewsData(object):
             result = reduce(lambda ns1, ns2: ns1 + '\n\n' + ns2, news_str_list)
         return result
 
-    def save(self, name):
+    def getWordsNum(self):
+        if len(self.newsItems) == 0:
+            return 0
+        num = 0
+        for item in self.newsItems:
+            num = num + len(item.title) + len(item.desc)
+        return num
+
+    def getFilePath(self):
         dataDir = os.getcwd() + os.sep + "data" + os.sep
         if os.path.exists(dataDir) is False:
             os.mkdir(dataDir)
-        filepath = dataDir + name + ' ' + self.startDate.strftime("%Y-%m-%d") + '.txt'
+        filepath = dataDir + self.name + ' ' + self.startDate.strftime("%Y-%m-%d") + '.txt'
+        return filepath
+
+    def save(self):
+        filepath = self.getFilePath()
         with open(filepath, 'w', encoding='utf-8') as f:
-            self.name = name
             try:
                 toDict = self.__toDict()
                 data = json.dumps(toDict, ensure_ascii=False)
@@ -216,8 +237,9 @@ class NewsData(object):
     def __fromDict(self, jsondict):
         self.name = jsondict['name']
         self.channelId, self.channelName = self.newsapi.findChannel(jsondict['channelName'])
-        self.startDate = jsondict['startDate']
-        self.lastMarkTime = jsondict['lastMarkTime']
+        self.startDate = datetime.strptime(jsondict['startDate'], "%Y-%m-%d")
+        self.lastMarkTime = datetime.strptime(jsondict['lastMarkTime'], "%Y-%m-%d %H:%M:%S")
+        self.keywords = jsondict['keywords']
         self.newsItems = list(map(lambda iDict: NewsItem(iDict), jsondict['items']))
 
     def __toDict(self):
@@ -226,5 +248,6 @@ class NewsData(object):
         d['channelName'] = self.channelName
         d['startDate'] = self.startDate.strftime("%Y-%m-%d")
         d['lastMarkTime'] = self.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")
+        d['keywords'] = self.keywords
         d['items'] = list(map(lambda item: item.toDict(), self.newsItems))
         return d
