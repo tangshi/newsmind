@@ -143,7 +143,6 @@ class NewsData(object):
             newsdata = self.newsapi.fetchNewsData(self.channelId, 1)
             newTimeStr = newsdata['showapi_res_body']['pagebean']['contentlist'][0]['pubDate']
             newMarkTime = datetime.strptime(newTimeStr, "%Y-%m-%d %H:%M:%S")
-            print(self.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S"))
             if self.allPages < 1:
                 self.currentPage = 1
                 self.allPages = newsdata['showapi_res_body']['pagebean']['allPages']
@@ -161,9 +160,7 @@ class NewsData(object):
                             exists = True
                             break
                     if not exists:
-                        print(newsitem.pubDate.strftime("%Y-%m-%d %H:%M:%S"))
                         self.newsItems.append(newsitem)
-                        print(newsitem.title)
                 return 0
 
             process_news_data()
@@ -220,7 +217,7 @@ class NewsData(object):
                 raise NewsError("Error: can not save news data")
 
     def load(self, filepath):
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             try:
                 self.__fromDict(json.loads(f.read()))
             except Exception as err:

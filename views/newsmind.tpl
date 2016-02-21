@@ -31,7 +31,7 @@
     </div>
 
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newTaskModal" onclick="initModal()">
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newTaskModal" onclick="initModal()">
       新建任务
     </button>
     <p></p>
@@ -77,20 +77,22 @@
 
     <div class="panel panel-success">
       <!-- panel contents -->
-      <div class="panel-heading">任务列表</div>
-      <div class="panel-body">
-        <p font-color="gray">
-          <i>任务列表按照创建时间的先后逆序排列，最新创建的任务排在第一位，点击任务条目可查看任务详情。</i>
-        </p>
+      <div class="panel-heading">
+          <h2>任务列表</h2>
+          <small>任务列表按照创建时间的先后逆序排列，最新创建的任务排在第一位，点击任务条目可查看任务详情。</small>
       </div>
 
       <!-- List group -->
       <ul class="list-group">
+        % if len(tasks) == 0:
+        <li class="list-group-item">尚未创建任何任务！</li>
+        % else:
         % for task in tasks:
         <a href="tasks/{{task.name}}" class="list-group-item">
           <h4 class="list-group-item-heading">{{task.name}}</h4>
           <p class="list-group-item-text"><small>创建于: {{task.datestr}}</small></p>
         </a>
+        % end
         % end
       </ul>
     </div>

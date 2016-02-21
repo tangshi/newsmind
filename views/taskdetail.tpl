@@ -46,13 +46,11 @@
       <p><b>任务名称：</b>{{task.name}}</p>
       <p><b>新闻频道：</b>{{task.newsdata.channelName}}</p>
       <p><b>创建日期：</b>{{task.newsdata.startDate.strftime("%Y-%m-%d")}}</p>
-      <%
-      if len(task.newsdata.newsItems)==0:
-      last = '无'
-      else:
-      last = task.newsdata.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")
-      end
-      %>
+      %if len(task.newsdata.newsItems)==0:
+      %last = '无'
+      %else:
+      %last = task.newsdata.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")
+      %end
       <p><b>最近更新：</b>{{last}}</p>
       <p><b>新闻条目：</b>{{len(task.newsdata.newsItems)}}</p>
       <p><b>总计字数：</b>{{task.newsdata.getWordsNum()}}</p>
@@ -60,7 +58,7 @@
 
     <div class="panel">
       <div class="panel-body">
-      <button id="refreshBtn" type="button" class="btn btn-sm btn-info pull-left">刷新数据</button>
+      <button id="refreshBtn" type="button" class="btn btn-sm btn-info pull-left">抓取最新数据</button>
       <form action="/deltask/{{task.name}}" accept-charset="utf-8">
         <button type="submit" class="btn btn-sm btn-danger pull-right">删除任务</button>
       </form>
@@ -71,12 +69,16 @@
       <li class="list-group-item list-group-item-success">
         <span class="badge">权重</span>关键词
       </li>
+      % if len(task.newsdata.keywords) == 0:
+      <li class="list-group-item">关键词未提取！</li>
+      % else:
       % i = 0
       % for word, weight in task.newsdata.keywords:
       % i = i + 1
       <li class="list-group-item">
         <span class="badge">{{int(weight*100)}}</span>{{i}}. {{word}}
       </li>
+      % end
       % end
     </ul>
   </div>

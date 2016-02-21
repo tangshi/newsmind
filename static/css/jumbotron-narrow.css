@@ -79,3 +79,7 @@ body {
     border-bottom: 0;
   }
 }
+
+.modal.fade.in {
+ top: 30%;
+}

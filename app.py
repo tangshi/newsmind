@@ -14,7 +14,7 @@ from news import NewsAPI, NewsData
 class Task:
     def __init__(self, name=None, filepath=None):
         if filepath is not None:
-            beg = filepath.rfind('/') + 1
+            beg = filepath.rfind(os.sep) + 1
             end = filepath.rfind(".")
             if end == -1:
                 end = len(filepath)
