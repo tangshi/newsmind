@@ -44,8 +44,16 @@
 
     <div class="well">
       <p><b>任务名称：</b>{{task.name}}</p>
+      <p><b>新闻频道：</b>{{task.newsdata.channelName}}</p>
       <p><b>创建日期：</b>{{task.newsdata.startDate.strftime("%Y-%m-%d")}}</p>
-      <p><b>最近更新：</b>{{task.newsdata.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")}}</p>
+      <%
+      if len(task.newsdata.newsItems)==0:
+      last = '无'
+      else:
+      last = task.newsdata.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S")
+      end
+      %>
+      <p><b>最近更新：</b>{{last}}</p>
       <p><b>新闻条目：</b>{{len(task.newsdata.newsItems)}}</p>
       <p><b>总计字数：</b>{{task.newsdata.getWordsNum()}}</p>
     </div>

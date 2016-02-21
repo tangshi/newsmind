@@ -89,7 +89,7 @@
         % for task in tasks:
         <a href="tasks/{{task.name}}" class="list-group-item">
           <h4 class="list-group-item-heading">{{task.name}}</h4>
-          <p class="list-group-item-text">创建于: {{task.datestr}}</p>
+          <p class="list-group-item-text"><small>创建于: {{task.datestr}}</small></p>
         </a>
         % end
       </ul>

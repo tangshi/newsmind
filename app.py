@@ -76,6 +76,8 @@ def showTask(taskname):
 @bottle.route('/tasks/<taskname>', method='POST')
 def refreshTask(taskname):
     task = findTask(taskname)
+    if task.newsdata is None:
+        task.newsdata = NewsData(newsapi, filepath=task.filepath)
     task.newsdata.fetch()
 
 

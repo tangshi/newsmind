@@ -120,22 +120,6 @@ class NewsData(object):
             self.name = name
             self.keywords = []
 
-    def __iter__(self):
-        self.__index = 0
-        return self
-
-    def __next__(self):
-        self.__index = self.__index + 1
-        if self.__index >= len(self.newsItems):
-            raise StopIteration()
-        return self.newsItems[self.__index - 1]
-
-    def __contains__(self, item):
-        for i in self.newsItems:
-            if item.hash == i.hash:
-                return True
-        return False
-
     def getKeyWords(self, topN=20, withWeight=True, exclude=None):
         exclude_default = set([u'记者', u'新闻', u'报', u'本报', u'月', u'日'])
         if exclude is not None:
@@ -159,6 +143,7 @@ class NewsData(object):
             newsdata = self.newsapi.fetchNewsData(self.channelId, 1)
             newTimeStr = newsdata['showapi_res_body']['pagebean']['contentlist'][0]['pubDate']
             newMarkTime = datetime.strptime(newTimeStr, "%Y-%m-%d %H:%M:%S")
+            print(self.lastMarkTime.strftime("%Y-%m-%d %H:%M:%S"))
             if self.allPages < 1:
                 self.currentPage = 1
                 self.allPages = newsdata['showapi_res_body']['pagebean']['allPages']
@@ -170,8 +155,15 @@ class NewsData(object):
                     newsitem = NewsItem(newsdict)
                     if newsitem.pubDate < self.lastMarkTime:
                         return -1
-                    if newsitem not in self.newsItems:
+                    exists = False
+                    for i in self.newsItems:
+                        if newsitem.hash == i.hash:
+                            exists = True
+                            break
+                    if not exists:
+                        print(newsitem.pubDate.strftime("%Y-%m-%d %H:%M:%S"))
                         self.newsItems.append(newsitem)
+                        print(newsitem.title)
                 return 0
 
             process_news_data()
@@ -182,6 +174,7 @@ class NewsData(object):
                 res_code = process_news_data()
                 if res_code != 0:
                     break
+            self.allPages = 0
             self.lastMarkTime = newMarkTime
             self.keywords = self.getKeyWords()
             self.save()
