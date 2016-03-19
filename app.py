@@ -368,4 +368,4 @@ def root():
     return template('newsmind', tasks=tasks, channels=newsapi.channels)
 
 
-run(bottle, host='localhost', port=8000, debug=True, reloader=True)
+run(bottle, host='127.0.0.1', port=8000, debug=True, reloader=True)
