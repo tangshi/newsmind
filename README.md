@@ -13,3 +13,7 @@
 3. 删除本程序所在文件夹
 
 ![示意图](static/installpython.jpg)
+
+## dev分支
+
+在dev分支中开发，完成后合并到master分支
